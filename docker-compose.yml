@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  db:
+    image: mysql/mysql-server:latest
+    platform: linux/arm64 
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: db_name
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+
+  # WordPress Application
+  wordpress:
+    image: wordpress:latest
+    platform: linux/arm64
+    depends_on:
+      - db
+    ports:
+      - "8000:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DB_NAME: db_name_local
+      WORDPRESS_DEBUG: true
+    volumes:
+      - ./wordpress:/var/www/html
+
+volumes:
+  db_data:
